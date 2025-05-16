@@ -1,0 +1,216 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #001f3f;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-page {
+  padding: 20px;
+}
+
+.welcome-header {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.entry-dropdown,
+.subfield-dropdown,
+.constraint-dropdown {
+  margin-bottom: 10px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+input,
+select {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+button {
+  background-color: #0d8503;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0b6c02;
+}
+
+/* Dropdown Styling */
+select {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+select:hover {
+  background-color: #e0e0e0;
+}
+
+.applied-filters {
+  margin-top: 20px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: #002d62;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+.filter-item span {
+  margin-right: 10px;
+}
+
+.filter-item button {
+  background-color: #e94e77; /* Red button to remove filter */
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filter-item button:hover {
+  background-color: #d43b64;
+}
+
+/* Candidate Table */
+.candidate-table {
+  margin-top: 20px;
+  overflow-x: auto; /* Add horizontal scroll for wide tables */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  color: #333;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+thead {
+  background-color: #002d62;
+  color: white;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #e6f7ff;
+}
+
+td {
+  word-wrap: break-word; /* Ensure long text wraps in the table cells */
+}
+
+td div {
+  margin-bottom: 5px; /* Space between array items */
+}
+
+/* Styling for nested dropdowns */
+.filter-section select {
+  min-width: 250px;
+}
+
+.subfield-dropdown select,
+.constraint-dropdown select {
+  min-width: 200px;
+}
+
+/* Applied Filters Section */
+.applied-filters h2 {
+  margin-bottom: 10px;
+}
+
+.applied-filters .filter-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Buttons for Filters */
+button {
+  margin-top: 5px;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Ensure table responsiveness */
+table th,
+table td {
+  min-width: 100px;
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+  }
+
+  td div {
+    font-size: 12px;
+  }
+}
+
+/* Nested Dropdown Hover */
+.entry-dropdown {
+  position: relative;
+}
+
+.entry-dropdown select {
+  cursor: pointer;
+}
+
+.entry-dropdown select:hover {
+  background-color: #004080;
+  color: white;
+}
+
+
+
