@@ -1,0 +1,285 @@
+/* App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #001f3f;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #002d62;
+  color: white;
+  padding: 20px;
+}
+
+.header .text {
+  margin-left: 20px;
+}
+
+.header .hindi-text {
+  font-size: 20px;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+.header .hindi-subtext {
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 1.2;
+}
+
+.header .main-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.header .main-titlee {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.header img {
+  height: 100px;
+}
+
+.line {
+  height: 100px;
+  width: 2px;
+  background-color: white;
+  margin: 0 20px;
+}
+
+.text {
+  text-align: left;
+  color: white;
+}
+
+.sub-header {
+  background-color: #0779eb;
+  color: white;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  font-size: 28px;
+  z-index: 2; /* Increased z-index to ensure it is above the sidebar */
+}
+
+.sub-header .menu-icon {
+  cursor: pointer;
+  font-size: 28px;
+  margin-right: 20px;
+}
+
+.form-container {
+  padding: 20px;
+  border-radius: 10px;
+  max-width: calc(100% - 270px); /* Adjust the max-width to account for the sidebar */
+  margin-left: 270px; /* Adjust the margin-left to account for the sidebar */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: white; /* Label text color */
+  font-size: 20px; /* Increased font size */
+  padding: 5px; /* Padding around the label */
+  border-radius: 5px; /* Rounded corners */
+}
+
+input, select, textarea {
+  width: 95%; 
+  padding: 10px;
+  font-weight: bold;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  color: black;
+  font-size: 17px;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #0d8503;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0d8503;
+}
+
+.side-menu {
+  position: absolute;
+  top: 210px; /* Adjust this to start below the sub-header */
+  bottom: auto;
+  left: 0;
+  width: 260px;
+  height: calc(100% - -600px); /* Adjust the height to fill the rest of the page */
+  background-color: #002d62;
+  color: white;
+  overflow-y: auto;
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for better integration */
+  transition: transform 0.5s;
+  z-index: 1; /* Ensure it stays above the form but below the header */
+  font-size: 20px;
+  transform: translateX(0); /* Hide the sidebar by default */
+}
+
+.side-menu ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.side-menu ul li {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.side-menu ul li:hover {
+  background-color: #1a73e8;
+}
+
+.side-menu.open {
+  transform: translateX(-100%);
+}
+
+.side-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.side-menu li {
+  position: relative;
+  padding: 10px 0;
+  margin-bottom: 15px;
+  font-size: 19px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.check-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  position: relative;
+}
+
+.check-circle::before {
+  content: attr(data-step);
+  color: #000;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
+}
+
+.check-circle.checked::before {
+  content: '';
+}
+
+.check-circle.checked::after {
+  content: '\2714'; /* Check mark */
+  color: #fff;
+  font-size: 16px;
+}
+
+.check-circle.checked {
+  border-color: #4caf50;
+  background-color: #4caf50;
+}
+
+h3 {
+  color: white;
+  font-size: 20px;
+}
+
+p {
+  color: white;
+  font-size: 24px;
+  background-color: rgb(0, 93, 139);
+}
+
+h1 {
+  color: white;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.declaration-container {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.declaration-checkbox {
+  width: 24px; /* Larger checkbox size */
+  height: 24px;
+  margin-right: 10px; /* Space between checkbox and label */
+}
+
+.declaration-label {
+  color: white;
+  font-size: 20px;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns the buttons and labels on the left */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center; /* Ensures proper vertical alignment of radio buttons with the label text */
+  margin-bottom: 10px; /* Adds space between options */
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 10px; 
+}
+
+.error {
+  color: red; /* You can change this to any color you prefer */
+  font-size: 15px; /* Optional: Adjust the size of the error message */
+  margin-top: 5px; /* Optional: Space between input and error message */
+  display: block; 
+}
+
+/* styles.css */
+.custom-file-input {
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 4px; /* Optional: rounded corners */
+  padding: 8px; /* Add some padding */
+  background-color: #fff; /* White background color */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+.custom-file-input:hover {
+  border-color: #999; /* Change border color on hover */
+}
+
+h4 {
+  color: yellow;
+}
