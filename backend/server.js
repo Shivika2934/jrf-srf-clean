@@ -6,6 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Joi = require('joi');
+const XLSX = require('xlsx');
 
 const app = express();
 const PORT = 5000;
@@ -153,7 +154,6 @@ const formValidationSchema = Joi.object({
 });
 
 // Route to Handle Form Submission
-// Route to Handle Form Submission
 app.post('/api/submit', upload.any(), async (req, res) => {
     try {
         // Log incoming request body and files
@@ -266,6 +266,87 @@ app.post('/api/submit', upload.any(), async (req, res) => {
     }
 });
 
+// Helper function to flatten nested fields and format dates
+const flattenCandidateData = (candidate) => {
+  const flatData = {};
+
+  Object.entries(candidate).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        Object.entries(item).forEach(([nestedKey, nestedValue]) => {
+          // Format nested dates safely
+          if (nestedKey.toLowerCase().includes('date') || nestedKey === 'from' || nestedKey === 'to') {
+            flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
+              ? new Date(nestedValue).toISOString().split('T')[0]
+              : ''; // Use an empty string for invalid dates
+          } else {
+            flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue || '';
+          }
+        });
+      });
+    } else if (key.toLowerCase().includes('date')) {
+      // Format top-level dates safely
+      flatData[key] = value && !isNaN(new Date(value).getTime())
+        ? new Date(value).toISOString().split('T')[0]
+        : ''; // Use an empty string for invalid dates
+    } else {
+      flatData[key] = value || '';
+    }
+  });
+
+  return flatData;
+};
+
+// Endpoint to download data as an Excel file (with optional filters)
+app.post('/api/downloadExcel', async (req, res) => {
+    try {
+        const { filters } = req.body || {}; // Get filters from the request body
+        const query = {};
+
+        // Apply filters to the query
+        if (filters && filters.length > 0) {
+            filters.forEach((filter) => {
+                query[filter.entry] = filter.constraint;
+            });
+        }
+
+        console.log('Query for filtered data:', query); // Debugging: Log the query
+
+        const candidates = await FormData.find(query); // Fetch filtered candidates from the database
+
+        if (!candidates || candidates.length === 0) {
+            console.log('No candidates found for the given filters.');
+            return res.status(404).json({ error: 'No candidates found to export' });
+        }
+
+        // Flatten all candidate data
+        const flattenedData = candidates.map((candidate) => flattenCandidateData(candidate.toObject()));
+
+        // Debugging: Log the flattened data to verify
+        console.log('Flattened Data:', flattenedData);
+
+        // Create a new workbook and worksheet
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(flattenedData);
+
+        // Append the worksheet to the workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Candidates');
+
+        // Write the workbook to a buffer
+        const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+        // Debugging: Log success before sending the file
+        console.log('Excel file generated successfully.');
+
+        // Set response headers and send the file
+        res.setHeader('Content-Disposition', 'attachment; filename="candidates.xlsx"');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.send(buffer);
+    } catch (err) {
+        console.error('Error generating Excel file:', err);
+        res.status(500).json({ error: 'Failed to generate Excel file' });
+    }
+});
 
 // Start Server
 app.listen(PORT, () => {
