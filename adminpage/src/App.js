@@ -12,10 +12,20 @@ const App = () => {
   const [filters, setFilters] = useState([]); // Applied filters
   const [candidates, setCandidates] = useState([]); // Candidate data
 
+  // List of fields to exclude from filter dropdown
+  const filterExclusions = ['_id', '__v', 'motherName', 'fatherName', 'passportPhoto', 'phdDocuments', 'convictionDetails', 'enquiryDetails', 'plagiarismDetails', 'marksheet'];
+
   useEffect(() => {
     fetch('http://localhost:5001/api/getEntries')
       .then((res) => res.json())
-      .then((data) => setEntries(data))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setEntries(data);
+        } else {
+          console.error('Expected entries to be an array, got:', data);
+          setEntries([]);
+        }
+      })
       .catch((err) => console.error('Error fetching entries:', err));
 
     fetchCandidates();
@@ -24,8 +34,18 @@ const App = () => {
   const fetchCandidates = () => {
     fetch('http://localhost:5001/api/getCandidates')
       .then((res) => res.json())
-      .then((data) => setCandidates(data))
-      .catch((err) => console.error('Error fetching candidates:', err));
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCandidates(data);
+        } else {
+          setCandidates([]);
+          console.error('Expected candidates to be an array, got:', data);
+        }
+      })
+      .catch((err) => {
+        setCandidates([]);
+        console.error('Error fetching candidates:', err);
+      });
   };
 
   useEffect(() => {
@@ -52,16 +72,32 @@ const App = () => {
     const query = subfield ? `${entry}.${subfield}` : entry;
     fetch(`http://localhost:5001/api/getConstraintOptions?entry=${query}`)
       .then((res) => res.json())
-      .then((data) => setConstraintOptions(data))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setConstraintOptions(data);
+        } else {
+          console.error('Expected constraint options to be an array, got:', data);
+          setConstraintOptions([]);
+        }
+      })
       .catch((err) => console.error('Error fetching constraint options:', err));
   };
 
   const handleAddFilter = () => {
-    if (selectedEntry && selectedConstraint) {
-      const filter = {
-        entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
-        constraint: selectedConstraint,
-      };
+    if (selectedEntry && (selectedConstraint || (selectedEntry === 'percentage' || selectedSubfield === 'percentage'))) {
+      let filter;
+      if ((selectedEntry === 'percentage' || selectedSubfield === 'percentage') && (selectedConstraint === 'gt' || selectedConstraint === 'lt')) {
+        filter = {
+          entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
+          constraint: selectedConstraint,
+          value: constraintOptions[0]
+        };
+      } else {
+        filter = {
+          entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
+          constraint: selectedConstraint,
+        };
+      }
       setFilters([...filters, filter]);
       resetFilterFields();
     }
@@ -82,12 +118,105 @@ const App = () => {
         body: JSON.stringify({ filters }),
       })
         .then((res) => res.json())
-        .then((data) => setCandidates(data))
-        .catch((err) => console.error('Error applying filters:', err));
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setCandidates(data);
+          } else {
+            setCandidates([]);
+            console.error('Expected candidates to be an array, got:', data);
+          }
+        })
+        .catch((err) => {
+          setCandidates([]);
+          console.error('Error applying filters:', err);
+        });
     } else {
       fetchCandidates();
     }
   }, [filters]);
+
+  const isValidDate = (value) => {
+    const date = new Date(value);
+    return !isNaN(date.getTime());
+  };
+
+  // Utility function to capitalize the first letter of each word
+  const capitalizeWords = (str) => {
+    if (typeof str !== 'string') return str === undefined || str === null ? '' : String(str);
+    return str
+      .split(/(?=[A-Z])|_/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  // Utility function to format column names and nested field names
+  const formatColumnName = (name) => {
+    return name
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .replace(/_/g, ' ') // Replace underscores with spaces
+      .replace(/\[(\d+)\]/g, ' $1') // Format array indices
+      .replace(/\./g, ' ') // Replace dots with spaces
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
+  };
+
+  const handleDownloadExcel = () => {
+    console.log('Download Excel button clicked'); // Debugging: Log button click
+    fetch('http://localhost:5000/api/downloadExcel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filters: [] }), // Send an empty filters array for all data
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((error) => {
+            console.error('Error response from server:', error); // Debugging: Log server error
+            throw new Error(error.error || 'Failed to download Excel file');
+          });
+        }
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'candidates.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        console.log('Excel file downloaded successfully'); // Debugging: Log success
+      })
+      .catch((err) => console.error('Error downloading Excel file:', err.message));
+  };
+
+  const handleDownloadFilteredExcel = () => {
+    console.log('Filters being sent:', filters); // Debugging: Log the filters being sent
+    fetch('http://localhost:5000/api/downloadExcel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filters }), // Send filters in the request body
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((error) => {
+            console.error('Error response from server:', error); // Debugging: Log server error
+            throw new Error(error.error || 'Failed to download Excel file');
+          });
+        }
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'filtered_candidates.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        console.log('Filtered Excel file downloaded successfully.'); // Debugging: Log success
+      })
+      .catch((err) => console.error('Error downloading Excel file:', err.message));
+  };
 
   return (
     <div className="admin-page">
@@ -107,11 +236,13 @@ const App = () => {
             }}
           >
             <option value="">-- Select --</option>
-            {entries.map((entry, i) => (
-              <option key={i} value={entry}>
-                {entry}
-              </option>
-            ))}
+            {entries
+              .filter((entry) => !filterExclusions.includes(entry))
+              .map((entry, i) => (
+                <option key={i} value={entry}>
+                  {capitalizeWords(entry)}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -128,17 +259,39 @@ const App = () => {
               }}
             >
               <option value="">-- Select Subfield --</option>
-              {subFields.map((sub, i) => (
-                <option key={i} value={sub}>
-                  {sub}
-                </option>
-              ))}
+              {subFields
+                .filter((sub) => !filterExclusions.includes(sub))
+                .map((sub, i) => (
+                  <option key={i} value={sub}>
+                    {capitalizeWords(sub)}
+                  </option>
+                ))}
             </select>
           </div>
         )}
 
         {/* Constraint Selection */}
-        {constraintOptions.length > 0 && (
+        {(selectedSubfield === 'percentage' || selectedEntry === 'percentage') ? (
+          <div>
+            <label htmlFor="constraint-select">Select Constraint: </label>
+            <select
+              id="constraint-select"
+              value={selectedConstraint}
+              onChange={(e) => setSelectedConstraint(e.target.value)}
+            >
+              <option value="">-- Select Constraint --</option>
+              <option value="gt">Greater Than</option>
+              <option value="lt">Less Than</option>
+            </select>
+            <input
+              type="number"
+              placeholder="Enter value"
+              onChange={(e) => setConstraintOptions([e.target.value])}
+              value={constraintOptions[0] || ''}
+              style={{ marginLeft: '8px' }}
+            />
+          </div>
+        ) : constraintOptions.length > 0 && (
           <div>
             <label htmlFor="constraint-select">Select Constraint: </label>
             <select
@@ -149,7 +302,7 @@ const App = () => {
               <option value="">-- Select Constraint --</option>
               {constraintOptions.map((opt, i) => (
                 <option key={i} value={opt}>
-                  {opt}
+                  {capitalizeWords(opt)}
                 </option>
               ))}
             </select>
@@ -162,56 +315,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* <div className="filter-section">
-        <select
-          value={selectedEntry}
-          onChange={(e) => {
-            setSelectedEntry(e.target.value);
-            setSelectedSubfield('');
-            setConstraintOptions([]);
-          }}
-        >
-          <option value="">-- Select Entry --</option>
-          {entries.map((entry, i) => (
-            <option key={i} value={entry}>
-              {entry}
-            </option>
-          ))}
-        </select>
-
-        {subFields.length > 0 && (
-          <select
-            value={selectedSubfield}
-            onChange={(e) => {
-              setSelectedSubfield(e.target.value);
-              fetchConstraintOptions(selectedEntry, e.target.value);
-            }}
-          >
-            <option value="">-- Select Subfield --</option>
-            {subFields.map((sub, i) => (
-              <option key={i} value={sub}>
-                {sub}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {constraintOptions.length > 0 && (
-          <select
-            value={selectedConstraint}
-            onChange={(e) => setSelectedConstraint(e.target.value)}
-          >
-            <option value="">-- Select Constraint --</option>
-            {constraintOptions.map((opt, i) => (
-              <option key={i} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        )}
-        <button onClick={handleAddFilter}>Add Filter</button>
-      </div> */}
-
       <div className="applied-filters">
         {filters.map((filter, i) => (
           <div key={i}>
@@ -221,22 +324,49 @@ const App = () => {
         ))}
       </div>
 
+      <div className="download-section">
+        <button onClick={handleDownloadExcel}>Download Excel</button>
+        <button onClick={handleDownloadFilteredExcel}>Download Filtered Excel</button>
+      </div>
+
       <div className="candidate-table">
         <table>
           <thead>
             <tr>
               {entries.map((header, i) => (
-                <th key={i}>{header}</th>
+                <th key={i}>{formatColumnName(header)}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {candidates.map((candidate, i) => (
+            {(Array.isArray(candidates) ? candidates : []).map((candidate, i) => (
               <tr key={i}>
                 {entries.map((field, j) => (
                   <td key={j}>
-                    {typeof candidate[field] === 'object'
-                      ? JSON.stringify(candidate[field])
+                    {Array.isArray(candidate[field])
+                      ? candidate[field].map((item, idx) => (
+                          <div key={idx}>
+                            {typeof item === 'object'
+                              ? Object.entries(item)
+                                  .filter(([key]) => key !== 'id') // Exclude the 'id' field
+                                  .map(([key, value]) => (
+                                    <div key={key}>
+                                      <strong>{formatColumnName(key)}:</strong> {value}
+                                    </div>
+                                  ))
+                              : item}
+                          </div>
+                        ))
+                      : typeof candidate[field] === 'object'
+                      ? Object.entries(candidate[field])
+                          .filter(([key]) => key !== 'id') // Exclude the 'id' field
+                          .map(([key, value]) => (
+                            <div key={key}>
+                              <strong>{formatColumnName(key)}:</strong> {value}
+                            </div>
+                          ))
+                      : isValidDate(candidate[field])
+                      ? new Date(candidate[field]).toLocaleDateString()
                       : candidate[field]}
                   </td>
                 ))}

@@ -137,7 +137,33 @@ app.post('/api/filterCandidates', async (req, res) => {
     const query = {};
 
     filters.forEach((filter) => {
-      query[filter.entry] = filter.constraint;
+      // Handle nested percentage in educationDetails or workExperienceDetails
+      if (
+        (filter.entry === 'percentage' || filter.entry.endsWith('.percentage')) &&
+        (filter.constraint === 'gt' || filter.constraint === 'lt')
+      ) {
+        // Check if it's a nested field (e.g., educationDetails.percentage)
+        const [parent, child] = filter.entry.split('.');
+        if (child === 'percentage') {
+          // Use $elemMatch for array of objects
+          query[parent] = {
+            $elemMatch: {
+              [child]: {
+                ...(filter.constraint === 'gt' ? { $gt: Number(filter.value) } : {}),
+                ...(filter.constraint === 'lt' ? { $lt: Number(filter.value) } : {}),
+              },
+            },
+          };
+        } else {
+          // Top-level percentage
+          query[filter.entry] = {
+            ...(filter.constraint === 'gt' ? { $gt: Number(filter.value) } : {}),
+            ...(filter.constraint === 'lt' ? { $lt: Number(filter.value) } : {}),
+          };
+        }
+      } else {
+        query[filter.entry] = filter.constraint;
+      }
     });
 
     const filteredData = await FormData.find(query);
@@ -147,7 +173,6 @@ app.post('/api/filterCandidates', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch filtered candidates' });
   }
 });
-
 
 // Default route
 app.get('/', (req, res) => {
