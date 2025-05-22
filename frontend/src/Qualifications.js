@@ -1,7 +1,9 @@
 /* Qualifications.js */
 
 import React, { useState } from 'react';
-
+const currentYear = new Date().getFullYear();
+const minYear = currentYear - 100;
+const maxYear = currentYear + 100;
 function Qualifications({
   formData,
   handleChange,
@@ -34,9 +36,40 @@ function Qualifications({
     }
 
     // Validate year of qualifying NET/GATE
-    if (!formData.yearOfQualifying) {
-      formValid = false;
-      errors.yearOfQualifying = 'Year of qualifying NET/GATE is required';
+    if (formData.testQualified.includes("GATE")) {
+      if (!formData.yearOfQualifyingGATE) {
+        formValid = false;
+        errors.yearOfQualifyingGATE = 'Year of qualifying GATE is required';
+      } else if (
+        formData.yearOfQualifyingGATE < minYear ||
+        formData.yearOfQualifyingGATE > currentYear
+      ) {
+        formValid = false;
+        errors.yearOfQualifyingGATE = `Enter a valid year between ${minYear} and ${currentYear}`;
+      }
+
+      if (!formData.marksGATE && formData.marksGATE !== 0) {
+        formValid = false;
+        errors.marksGATE = 'Marks in GATE are required';
+      }
+    }
+
+    if (formData.testQualified.includes("NET")) {
+      if (!formData.yearOfQualifyingNET) {
+        formValid = false;
+        errors.yearOfQualifyingNET = 'Year of qualifying NET is required';
+      } else if (
+        formData.yearOfQualifyingNET < minYear ||
+        formData.yearOfQualifyingNET > currentYear
+      ) {
+        formValid = false;
+        errors.yearOfQualifyingNET = `Enter a valid year between ${minYear} and ${currentYear}`;
+      }
+
+      if (!formData.marksNET && formData.marksNET !== 0) {
+        formValid = false;
+        errors.marksNET = 'Marks in NET are required';
+      }
     }
 
     // Validate total work experience
@@ -52,6 +85,8 @@ function Qualifications({
     }
 
     // Validate educational details
+
+
     formData.educationDetails.forEach((education, index) => {
       if (!education.degree) {
         formValid = false;
@@ -135,22 +170,60 @@ function Qualifications({
           <option value="NET (Fellowship)">NET (Fellowship)</option>
           <option value="NET (Lectureship)">NET (Lectureship)</option>
           <option value="GATE">GATE</option>
-          <option value="Neither NET Nor GATE">Neither NET Nor GATE</option>
+          <option value="Neither Exam">Neither Exam</option>
         </select>
         {errors.testQualified && <span className="error">{errors.testQualified}</span>}
       </div>
-      <div>
-        <label>What is the year of qualifying NET/GATE?</label>
-        <input 
-          type="number" 
-          name="yearOfQualifying" 
-          value={formData.yearOfQualifying} 
-          onChange={handleChange} 
-          min="2005" 
-          max={new Date().getFullYear()} // This will set the maximum value to the current year
-        />
-        {errors.yearOfQualifying && <span className="error">{errors.yearOfQualifying}</span>}
-      </div>
+      {formData.testQualified.includes("NET") && (
+        <div>
+          <label>Year of Qualifying NET:</label>
+          <input
+            type="number"
+            name="yearOfQualifyingNET"
+            value={formData.yearOfQualifyingNET || ""}
+            onChange={handleChange}
+            min={new Date().getFullYear() - 100}
+            max={new Date().getFullYear()}
+          />
+          {errors.yearOfQualifyingNET && <span className="error">{errors.yearOfQualifyingNET}</span>}
+          <label>Marks Obtained in NET :</label>
+          <input
+            type="number"
+            name="marksNET"
+            value={formData.marksNET || ""}
+            onChange={handleChange}
+            min="0"
+            max="300"
+
+          />
+          {errors.marksNET && <span className="error">{errors.marksNET}</span>}
+        </div>
+      )}
+      {formData.testQualified.includes("GATE") && (
+        <div>
+          <label>Year of Qualifying GATE:</label>
+          <input
+            type="number"
+            name="yearOfQualifyingGATE"
+            value={formData.yearOfQualifyingGATE || ""}
+            onChange={handleChange}
+            min={new Date().getFullYear() - 100}
+            max={new Date().getFullYear()}
+          />
+          {errors.yearOfQualifyingGATE && <span className="error">{errors.yearOfQualifyingGATE}</span>}
+          <label>Marks Obtained in GATE :</label>
+          <input
+            type="number"
+            name="marksGATE"
+            value={formData.marksGATE || ""}
+            onChange={handleChange}
+            min="0"
+            max="100"
+
+          />
+          {errors.marksGATE && <span className="error">{errors.marksGATE}</span>}
+        </div>
+      )}
       <div>
         <label>Total Work Experience:</label>
         <select name="totalWorkExperience" value={formData.totalWorkExperience} onChange={handleChange}>
@@ -286,7 +359,7 @@ function Qualifications({
       ))}
       <button type="button" onClick={addExperienceField}>Add Work Experience</button>
       <div>
-      <br/>
+        <br />
         <button type="button" onClick={prevStep}>Previous</button>&nbsp;&nbsp;
         <button type="button" onClick={handleNextStep}>Next</button>
       </div>

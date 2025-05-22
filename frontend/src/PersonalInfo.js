@@ -17,7 +17,7 @@ function PersonalInfo({ formData, handleChange, handlePhotoChange, nextStep }) {
     if (!formData.fullName) {
       formValid = false;
       errors.fullName = "Full Name is required";
-    } 
+    }
     else if (!/^[A-Z ]+$/.test(formData.fullName)) {
       formValid = false;
       errors.fullName = "Full Name must be in block letters";
@@ -57,7 +57,11 @@ function PersonalInfo({ formData, handleChange, handlePhotoChange, nextStep }) {
     if (!formData.email) {
       formValid = false;
       errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      formValid = false;
+      errors.email = "Enter a valid email address";
     }
+
 
     if (!formData.category) {
       formValid = false;
