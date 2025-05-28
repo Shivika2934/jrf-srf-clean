@@ -15,7 +15,8 @@ function Qualifications({
   addExperienceField,
   removeExperienceField,
   nextStep,
-  prevStep
+  prevStep,
+  testQualified // <-- add this prop
 }) {
   const [errors, setErrors] = useState({});
 
@@ -173,18 +174,30 @@ function Qualifications({
         </select>
         {errors.testQualified && <span className="error">{errors.testQualified}</span>}
       </div>
-      <div>
-        <label>What is the year of qualifying NET/GATE?</label>
-        <input
-          type="number"
-          name="yearOfQualifying"
-          value={formData.yearOfQualifying}
-          onChange={handleChange}
-          min="2005"
-          max={new Date().getFullYear()} // This will set the maximum value to the current year
-        />
-        {errors.yearOfQualifying && <span className="error">{errors.yearOfQualifying}</span>}
-      </div>
+      {/* Conditionally show year of qualifying based on testQualified */}
+      {(formData.testQualified === "Both NET & GATE" ||
+        formData.testQualified === "NET (Fellowship)" ||
+        formData.testQualified === "NET (Lectureship)" ||
+        formData.testQualified === "GATE") && (
+        <div>
+          <label>
+            {formData.testQualified === "GATE"
+              ? "What is the year of qualifying GATE?"
+              : formData.testQualified === "NET (Lectureship)" || formData.testQualified === "NET (Fellowship)"
+              ? "What is the year of qualifying NET?"
+              : "What is the year of qualifying NET/GATE?"}
+          </label>
+          <input
+            type="number"
+            name="yearOfQualifying"
+            value={formData.yearOfQualifying}
+            onChange={handleChange}
+            min="2005"
+            max={new Date().getFullYear()}
+          />
+          {errors.yearOfQualifying && <span className="error">{errors.yearOfQualifying}</span>}
+        </div>
+      )}
       <div>
         <label>Total Work Experience:</label>
         <select name="totalWorkExperience" value={formData.totalWorkExperience} onChange={handleChange}>

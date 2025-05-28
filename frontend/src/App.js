@@ -411,6 +411,8 @@ function App() {
             addEducationField={addEducationField}
             nextStep={nextStep}
             prevStep={prevStep}
+            // Pass testQualified as a prop for conditional rendering
+            testQualified={formData.testQualified}
           />
         )}
         {step === 3 && (
