@@ -137,34 +137,15 @@ app.post('/api/filterCandidates', async (req, res) => {
     const query = {};
 
     filters.forEach((filter) => {
-      // Handle nested percentage in educationDetails or workExperienceDetails
-      if (
-        (filter.entry === 'percentage' || filter.entry.endsWith('.percentage')) &&
-        (filter.constraint === 'gt' || filter.constraint === 'lt')
-      ) {
-        // Check if it's a nested field (e.g., educationDetails.percentage)
-        const [parent, child] = filter.entry.split('.');
-        if (child === 'percentage') {
-          // Use $elemMatch for array of objects
-          query[parent] = {
-            $elemMatch: {
-              [child]: {
-                ...(filter.constraint === 'gt' ? { $gt: Number(filter.value) } : {}),
-                ...(filter.constraint === 'lt' ? { $lt: Number(filter.value) } : {}),
-              },
-            },
-          };
-        } else {
-          // Top-level percentage
-          query[filter.entry] = {
-            ...(filter.constraint === 'gt' ? { $gt: Number(filter.value) } : {}),
-            ...(filter.constraint === 'lt' ? { $lt: Number(filter.value) } : {}),
-          };
-        }
-      } else {
+      // Only allow equality, and cast to correct type for numbers
+      // Find the field in the schema that is a number
+      
         query[filter.entry] = filter.constraint;
-      }
+      
     });
+
+    // Debug: log the query
+    console.log('MongoDB filter query:', JSON.stringify(query, null, 2));
 
     const filteredData = await FormData.find(query);
     res.json(filteredData);

@@ -13,7 +13,11 @@ const App = () => {
   const [candidates, setCandidates] = useState([]); // Candidate data
 
   // List of fields to exclude from filter dropdown
-  const filterExclusions = ['_id', '__v', 'motherName', 'fatherName', 'passportPhoto', 'phdDocuments', 'convictionDetails', 'enquiryDetails', 'plagiarismDetails', 'marksheet'];
+  const filterExclusions = [
+    '_id', '__v', 'motherName', 'fatherName', 'passportPhoto', 'phdDocuments',
+    'convictionDetails', 'enquiryDetails', 'plagiarismDetails', 'marksheet',
+    'address', 'contactNumbers'
+  ];
 
   useEffect(() => {
     fetch('http://localhost:5001/api/getEntries')
@@ -84,20 +88,11 @@ const App = () => {
   };
 
   const handleAddFilter = () => {
-    if (selectedEntry && (selectedConstraint || (selectedEntry === 'percentage' || selectedSubfield === 'percentage'))) {
-      let filter;
-      if ((selectedEntry === 'percentage' || selectedSubfield === 'percentage') && (selectedConstraint === 'gt' || selectedConstraint === 'lt')) {
-        filter = {
-          entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
-          constraint: selectedConstraint,
-          value: constraintOptions[0]
-        };
-      } else {
-        filter = {
-          entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
-          constraint: selectedConstraint,
-        };
-      }
+    if (selectedEntry && selectedConstraint) {
+      const filter = {
+        entry: selectedSubfield ? `${selectedEntry}.${selectedSubfield}` : selectedEntry,
+        constraint: selectedConstraint,
+      };
       setFilters([...filters, filter]);
       resetFilterFields();
     }
@@ -271,27 +266,7 @@ const App = () => {
         )}
 
         {/* Constraint Selection */}
-        {(selectedSubfield === 'percentage' || selectedEntry === 'percentage') ? (
-          <div>
-            <label htmlFor="constraint-select">Select Constraint: </label>
-            <select
-              id="constraint-select"
-              value={selectedConstraint}
-              onChange={(e) => setSelectedConstraint(e.target.value)}
-            >
-              <option value="">-- Select Constraint --</option>
-              <option value="gt">Greater Than</option>
-              <option value="lt">Less Than</option>
-            </select>
-            <input
-              type="number"
-              placeholder="Enter value"
-              onChange={(e) => setConstraintOptions([e.target.value])}
-              value={constraintOptions[0] || ''}
-              style={{ marginLeft: '8px' }}
-            />
-          </div>
-        ) : constraintOptions.length > 0 && (
+        {constraintOptions.length > 0 && (
           <div>
             <label htmlFor="constraint-select">Select Constraint: </label>
             <select
