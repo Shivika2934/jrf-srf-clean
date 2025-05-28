@@ -223,6 +223,7 @@ app.post('/api/submit', upload.any(), async (req, res) => {
 
         // Create and save form data to MongoDB
         const formData = new FormData({
+            _id,
             applicationFor,
             fullName,
             fatherName,
@@ -270,25 +271,28 @@ app.post('/api/submit', upload.any(), async (req, res) => {
 const flattenCandidateData = (candidate) => {
   const flatData = {};
 
+  // Always include _id as the first column, fallback to empty string if not present
+  // Fix: Use candidate._id directly for the "_id" column, not "id"
+  flatData['_id'] = candidate._id ? candidate._id.toString() : '';
+
   Object.entries(candidate).forEach(([key, value]) => {
+    if (key === '_id' || key === 'id' || key === '__v') return; // _id already handled, skip id/__v
     if (Array.isArray(value)) {
       value.forEach((item, index) => {
         Object.entries(item).forEach(([nestedKey, nestedValue]) => {
-          // Format nested dates safely
           if (nestedKey.toLowerCase().includes('date') || nestedKey === 'from' || nestedKey === 'to') {
             flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
               ? new Date(nestedValue).toISOString().split('T')[0]
-              : ''; // Use an empty string for invalid dates
+              : '';
           } else {
             flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue || '';
           }
         });
       });
     } else if (key.toLowerCase().includes('date')) {
-      // Format top-level dates safely
       flatData[key] = value && !isNaN(new Date(value).getTime())
         ? new Date(value).toISOString().split('T')[0]
-        : ''; // Use an empty string for invalid dates
+        : '';
     } else {
       flatData[key] = value || '';
     }
