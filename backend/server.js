@@ -223,7 +223,7 @@ app.post('/api/submit', upload.any(), async (req, res) => {
 
         // Create and save form data to MongoDB
         const formData = new FormData({
-            _id,
+
             applicationFor,
             fullName,
             fatherName,
@@ -269,36 +269,36 @@ app.post('/api/submit', upload.any(), async (req, res) => {
 
 // Helper function to flatten nested fields and format dates
 const flattenCandidateData = (candidate) => {
-  const flatData = {};
+    const flatData = {};
 
-  // Always include _id as the first column, fallback to empty string if not present
-  // Fix: Use candidate._id directly for the "_id" column, not "id"
-  flatData['_id'] = candidate._id ? candidate._id.toString() : '';
+    // Always include _id as the first column, fallback to empty string if not present
+    // Fix: Use candidate._id directly for the "_id" column, not "id"
+    flatData['_id'] = candidate._id ? candidate._id.toString() : '';
 
-  Object.entries(candidate).forEach(([key, value]) => {
-    if (key === '_id' || key === 'id' || key === '__v') return; // _id already handled, skip id/__v
-    if (Array.isArray(value)) {
-      value.forEach((item, index) => {
-        Object.entries(item).forEach(([nestedKey, nestedValue]) => {
-          if (nestedKey.toLowerCase().includes('date') || nestedKey === 'from' || nestedKey === 'to') {
-            flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
-              ? new Date(nestedValue).toISOString().split('T')[0]
-              : '';
-          } else {
-            flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue || '';
-          }
-        });
-      });
-    } else if (key.toLowerCase().includes('date')) {
-      flatData[key] = value && !isNaN(new Date(value).getTime())
-        ? new Date(value).toISOString().split('T')[0]
-        : '';
-    } else {
-      flatData[key] = value || '';
-    }
-  });
+    Object.entries(candidate).forEach(([key, value]) => {
+        if (key === '_id' || key === 'id' || key === '__v') return; // _id already handled, skip id/__v
+        if (Array.isArray(value)) {
+            value.forEach((item, index) => {
+                Object.entries(item).forEach(([nestedKey, nestedValue]) => {
+                    if (nestedKey.toLowerCase().includes('date') || nestedKey === 'from' || nestedKey === 'to') {
+                        flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
+                            ? new Date(nestedValue).toISOString().split('T')[0]
+                            : '';
+                    } else {
+                        flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue || '';
+                    }
+                });
+            });
+        } else if (key.toLowerCase().includes('date')) {
+            flatData[key] = value && !isNaN(new Date(value).getTime())
+                ? new Date(value).toISOString().split('T')[0]
+                : '';
+        } else {
+            flatData[key] = value || '';
+        }
+    });
 
-  return flatData;
+    return flatData;
 };
 
 // Endpoint to download data as an Excel file (with optional filters)
