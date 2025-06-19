@@ -28,7 +28,7 @@ function App() {
     totalWorkExperience: '',
     discipline: '',
     educationDetails: [{ degree: '', board: '', year: '', percentage: '', marksheet: null }],
-    workExperienceDetails: [{ post: '', company: '', location: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }],
+    workExperienceDetails: [{ post: '', company: '', location: '', domain: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }],
     publications: [{ title: '', journal: '' }],
     registeredForPhD: '',
     phdDetails: '',
@@ -130,7 +130,7 @@ function App() {
   const addExperienceField = () => {
     setFormData({
       ...formData,
-      workExperienceDetails: [...formData.workExperienceDetails, { post: '', company: '', location: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }]
+      workExperienceDetails: [...formData.workExperienceDetails, { post: '', company: '', location: '', domain: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }]
     });
   };
 
@@ -162,9 +162,9 @@ function App() {
         alert("Please ensure all steps are completed properly.");
         return;
       }
-  
+
       const formDataToSubmit = new FormData();
-  
+
       // Append text fields
       formDataToSubmit.append('applicationFor', formData.applicationFor);
       formDataToSubmit.append('fullName', formData.fullName);
@@ -189,7 +189,7 @@ function App() {
       formDataToSubmit.append('enquiryDetails', formData.enquiryDetails || '');
       formDataToSubmit.append('chargedWithPlagiarism', formData.chargedWithPlagiarism);
       formDataToSubmit.append('plagiarismDetails', formData.plagiarismDetails || '');
-  
+
       // Append file inputs
       if (formData.photo && formData.photo.file) {
         formDataToSubmit.append('photo', formData.photo.file);
@@ -197,7 +197,7 @@ function App() {
       if (formData.phdDocuments && formData.phdDocuments.file) {
         formDataToSubmit.append('phdDocuments', formData.phdDocuments.file);
       }
-  
+
       // Append education details
       formData.educationDetails.forEach((education, index) => {
         formDataToSubmit.append(`educationDetails[${index}][degree]`, education.degree);
@@ -208,35 +208,36 @@ function App() {
           formDataToSubmit.append(`educationDetails[${index}][marksheet]`, education.marksheet.file);
         }
       });
-  
+
       // Append work experience details
       formData.workExperienceDetails.forEach((experience, index) => {
         formDataToSubmit.append(`workExperienceDetails[${index}][post]`, experience.post);
         formDataToSubmit.append(`workExperienceDetails[${index}][company]`, experience.company);
         formDataToSubmit.append(`workExperienceDetails[${index}][location]`, experience.location);
+        formDataToSubmit.append(`workExperienceDetails[${index}][domain]`, experience.domain);
         formDataToSubmit.append(`workExperienceDetails[${index}][fromYear]`, experience.fromYear);
         formDataToSubmit.append(`workExperienceDetails[${index}][toYear]`, experience.toYear);
         formDataToSubmit.append(`workExperienceDetails[${index}][fromMonth]`, experience.fromMonth);
         formDataToSubmit.append(`workExperienceDetails[${index}][toMonth]`, experience.toMonth);
         formDataToSubmit.append(`workExperienceDetails[${index}][duties]`, experience.duties);
       });
-  
+
       // Append publications
       formData.publications.forEach((publication, index) => {
         formDataToSubmit.append(`publications[${index}][title]`, publication.title);
         formDataToSubmit.append(`publications[${index}][journal]`, publication.journal);
       });
-  
+
       // Make the fetch request
       const response = await fetch('http://localhost:5000/api/submit', {
         method: 'POST',
         body: formDataToSubmit,
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const responseData = await response.json();
       console.log('Form submitted successfully:', responseData);
       alert("Application submitted successfully!");
@@ -259,7 +260,7 @@ function App() {
         totalWorkExperience: '',
         discipline: '',
         educationDetails: [{ degree: '', board: '', year: '', percentage: '', marksheet: null }],
-        workExperienceDetails: [{ post: '', company: '', location: '', fromYear: '', fromMonth: '', toYear: '', toMonth: '', duties: '' }],
+        workExperienceDetails: [{ post: '', company: '', location: '', domain: '', fromYear: '', fromMonth: '', toYear: '', toMonth: '', duties: '' }],
         publications: [{ title: '', journal: '' }],
         registeredForPhD: '',
         phdDetails: '',
@@ -277,11 +278,11 @@ function App() {
       alert("There was an error submitting your application. Please try again.");
     }
   };
-  
+
   const validateStep = () => {
     switch (step) {
       case 1: {
-        const { applicationFor, photo, fullName, fatherName, motherName, gender, dateOfBirth, email, category, address, contactNumbers} = formData;
+        const { applicationFor, photo, fullName, fatherName, motherName, gender, dateOfBirth, email, category, address, contactNumbers } = formData;
         return (
           applicationFor &&
           photo &&
@@ -304,7 +305,7 @@ function App() {
           yearOfQualifying &&
           totalWorkExperience &&
           educationDetails.every(edu => edu.degree && edu.board && edu.year && edu.percentage && edu.marksheet) &&
-          workExperienceDetails.every(exp => exp.post && exp.company && exp.location && exp.fromYear && exp.toYear && exp.fromMonth && exp.toMonth && exp.duties)
+          workExperienceDetails.every(exp => exp.post && exp.company && exp.location && exp.domain && exp.fromYear && exp.toYear && exp.fromMonth && exp.toMonth && exp.duties)
         );
       }
       case 3: {
@@ -383,7 +384,7 @@ function App() {
           </li>
           <li onClick={() => goToStep(3)} className={isStepCompleted(3) ? 'completed' : ''}>
             <span className={`check-circle ${isStepCompleted(3) ? 'checked' : ''}`} data-step="3"></span>
-            Self Declaration 
+            Self Declaration
           </li>
           <li onClick={() => goToStep(4)} className={isStepCompleted(4) ? 'completed' : ''}>
             <span className={`check-circle ${isStepCompleted(4) ? 'checked' : ''}`} data-step="4"></span>
@@ -393,11 +394,11 @@ function App() {
       </div>
       <div className="form-container">
         {step === 1 && (
-          <PersonalInfo 
-            formData={formData} 
-            handlePhotoChange={handlePhotoUploadChange} 
-            handleChange={handleChange}  
-            nextStep={nextStep} 
+          <PersonalInfo
+            formData={formData}
+            handlePhotoChange={handlePhotoUploadChange}
+            handleChange={handleChange}
+            nextStep={nextStep}
           />
         )}
         {step === 2 && (

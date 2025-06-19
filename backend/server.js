@@ -132,6 +132,7 @@ const formValidationSchema = Joi.object({
             post: Joi.string().required(),
             company: Joi.string().required(),
             location: Joi.string().required(),
+            domain: Joi.string().required(),
             fromYear: Joi.string().required(),
             toYear: Joi.string().required(),
             fromMonth: Joi.string().required(),

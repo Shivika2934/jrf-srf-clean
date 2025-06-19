@@ -60,7 +60,7 @@ const App = () => {
           setSubFields(['degree', 'board', 'year', 'percentage', 'marksheet']);
           break;
         case 'workExperienceDetails':
-          setSubFields(['post', 'company', 'location', 'fromYear', 'fromMonth', 'toYear', 'toMonth', 'duties']);
+          setSubFields(['post', 'company', 'location', 'domain','fromYear', 'fromMonth', 'toYear', 'toMonth', 'duties']);
           break;
         case 'publications':
           setSubFields(['title', 'journal']);

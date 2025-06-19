@@ -48,6 +48,7 @@ const formDataSchema = new mongoose.Schema({
       post: { type: String },
       company: { type: String },
       location: { type: String },
+      domain: { type: String },
       fromYear: { type: String },
       toYear: { type: String },
       fromMonth: { type: String },

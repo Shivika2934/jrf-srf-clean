@@ -60,6 +60,7 @@ function ReviewApply({ formData, handleSubmit, prevStep }) {
       submissionData.append(`workExperienceDetails[${index}][post]`, experience.post);
       submissionData.append(`workExperienceDetails[${index}][company]`, experience.company);
       submissionData.append(`workExperienceDetails[${index}][location]`, experience.location);
+      submissionData.append(`workExperienceDetails[${index}][domain]`, experience.domain);
       submissionData.append(`workExperienceDetails[${index}][fromYear]`, experience.fromYear);
       submissionData.append(`workExperienceDetails[${index}][toYear]`, experience.toYear);
       submissionData.append(`workExperienceDetails[${index}][fromMonth]`, experience.fromMonth);
@@ -210,6 +211,7 @@ function ReviewApply({ formData, handleSubmit, prevStep }) {
           <p>Post: {experience.post}</p>
           <p>Company: {experience.company}</p>
           <p>Location: {experience.location}</p>
+          <p>Domain: {experience.domain}</p>
           <p>From Year: {experience.fromYear}</p>
           <p>From Month: {experience.fromMonth}</p>
           <p>To Year: {experience.toYear}</p>

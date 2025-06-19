@@ -114,7 +114,10 @@ function Qualifications({
         formValid = false;
         errors[`location_${index}`] = `Location is required `;
       }
-
+      if (!experience.domain) {
+        formValid = false;
+        errors[`domain_${index}`] = `Internship domain is required `;
+      }
       if (!experience.fromYear) {
         formValid = false;
         errors[`fromYear_${index}`] = `From Year is required`;
@@ -324,6 +327,14 @@ function Qualifications({
             onChange={(e) => handleExperienceChange(index, e)}
           />
           {errors[`location_${index}`] && <span className="error">{errors[`location_${index}`]}</span>}
+          <input
+            type="text"
+            name="domain"
+            placeholder="Domain of Internship"
+            value={experience.domain}
+            onChange={(e) => handleExperienceChange(index, e)}
+          />
+          {errors[`domain_${index}`] && <span className="error">{errors[`domain_${index}`]}</span>}
           <input
             type="text"
             name="fromYear"
