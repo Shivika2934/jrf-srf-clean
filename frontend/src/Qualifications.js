@@ -4,6 +4,10 @@ import React, { useState } from 'react';
 const currentYear = new Date().getFullYear();
 const minYear = currentYear - 100;
 const maxYear = currentYear + 10;
+const validMonths = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
 function Qualifications({
   formData,
   handleChange,
@@ -111,27 +115,44 @@ function Qualifications({
         errors[`location_${index}`] = `Location is required `;
       }
 
-      if (!experience.from) {
+      if (!experience.fromYear) {
         formValid = false;
-        errors[`from_${index}`] = `From Date is required`;
+        errors[`fromYear_${index}`] = `From Year is required`;
       } else {
-        const fromYear = new Date(experience.from).getFullYear();
+        const fromYear = new Date(experience.fromYear).getFullYear();
         if (isNaN(fromYear) || fromYear < minYear || fromYear > maxYear) {
           formValid = false;
-          errors[`from_${index}`] = `From Date year must be between ${minYear} and ${maxYear}`;
+          errors[`fromYear_${index}`] = `From year must be between ${minYear} and ${maxYear}`;
+        }
+      }
+      if (!experience.fromMonth) {
+        formValid = false;
+        errors[`fromMonth_${index}`] = `From Month is required`;
+      } else if (!validMonths.includes(experience.fromMonth)) {
+        formValid = false;
+        errors[`fromMonth_${index}`] = `From Month must be between Jan and Dec`;
+      }
+
+      // Check To Month
+      if (!experience.toMonth) {
+        formValid = false;
+        errors[`toMonth_${index}`] = `To Month is required`;
+      } else if (!validMonths.includes(experience.toMonth)) {
+        formValid = false;
+        errors[`toMonth_${index}`] = `To Month must be between Jan and Dec`;
+      }
+      // Check To Year
+      if (!experience.toYear) {
+        formValid = false;
+        errors[`toYear_${index}`] = `To Year is required`;
+      } else {
+        const toYear = new Date(experience.toYear).getFullYear(); // Corrected here
+        if (isNaN(toYear) || toYear < minYear || toYear > maxYear) {
+          formValid = false;
+          errors[`toYear_${index}`] = `To year must be between ${minYear} and ${maxYear}`;
         }
       }
 
-      if (!experience.to) {
-        formValid = false;
-        errors[`to_${index}`] = `To Date is required`;
-      } else {
-        const toYear = new Date(experience.to).getFullYear();
-        if (isNaN(toYear) || toYear < minYear || toYear > maxYear) {
-          formValid = false;
-          errors[`to_${index}`] = `To Date year must be between ${minYear} and ${maxYear}`;
-        }
-      }
       if (!experience.duties) {
         formValid = false;
         errors[`duties_${index}`] = `Duties Performed are required `;
@@ -179,25 +200,25 @@ function Qualifications({
         formData.testQualified === "NET (Fellowship)" ||
         formData.testQualified === "NET (Lectureship)" ||
         formData.testQualified === "GATE") && (
-        <div>
-          <label>
-            {formData.testQualified === "GATE"
-              ? "What is the year of qualifying GATE?"
-              : formData.testQualified === "NET (Lectureship)" || formData.testQualified === "NET (Fellowship)"
-              ? "What is the year of qualifying NET?"
-              : "What is the year of qualifying NET/GATE?"}
-          </label>
-          <input
-            type="number"
-            name="yearOfQualifying"
-            value={formData.yearOfQualifying}
-            onChange={handleChange}
-            min="2005"
-            max={new Date().getFullYear()}
-          />
-          {errors.yearOfQualifying && <span className="error">{errors.yearOfQualifying}</span>}
-        </div>
-      )}
+          <div>
+            <label>
+              {formData.testQualified === "GATE"
+                ? "What is the year of qualifying GATE?"
+                : formData.testQualified === "NET (Lectureship)" || formData.testQualified === "NET (Fellowship)"
+                  ? "What is the year of qualifying NET?"
+                  : "What is the year of qualifying NET/GATE?"}
+            </label>
+            <input
+              type="number"
+              name="yearOfQualifying"
+              value={formData.yearOfQualifying}
+              onChange={handleChange}
+              min="2005"
+              max={new Date().getFullYear()}
+            />
+            {errors.yearOfQualifying && <span className="error">{errors.yearOfQualifying}</span>}
+          </div>
+        )}
       <div>
         <label>Total Work Experience:</label>
         <select name="totalWorkExperience" value={formData.totalWorkExperience} onChange={handleChange}>
@@ -305,20 +326,41 @@ function Qualifications({
           {errors[`location_${index}`] && <span className="error">{errors[`location_${index}`]}</span>}
           <input
             type="text"
-            name="from"
+            name="fromYear"
             placeholder="From Year"
-            value={experience.from}
+            value={experience.fromYear}
             onChange={(e) => handleExperienceChange(index, e)}
           />
-          {errors[`from_${index}`] && <span className="error">{errors[`from_${index}`]}</span>}
+          {errors[`fromYear_${index}`] && <span className="error">{errors[`fromYear_${index}`]}</span>}
           <input
             type="text"
-            name="to"
-            placeholder="To Year"
-            value={experience.to}
+            name="fromMonth"
+            placeholder="From Month (e.g., Jan)"
+            value={experience.fromMonth}
             onChange={(e) => handleExperienceChange(index, e)}
           />
-          {errors[`to_${index}`] && <span className="error">{errors[`to_${index}`]}</span>}
+          {errors[`fromMonth_${index}`] && (
+            <span className="error">{errors[`fromMonth_${index}`]}</span>
+          )}
+          <input
+            type="text"
+            name="toYear"
+            placeholder="To Year"
+            value={experience.toYear}
+            onChange={(e) => handleExperienceChange(index, e)}
+          />
+
+          {errors[`toYear_${index}`] && <span className="error">{errors[`toYear_${index}`]}</span>}
+          <input
+            type="text"
+            name="toMonth"
+            placeholder="To Month (e.g., Dec)"
+            value={experience.toMonth}
+            onChange={(e) => handleExperienceChange(index, e)}
+          />
+          {errors[`toMonth_${index}`] && (
+            <span className="error">{errors[`toMonth_${index}`]}</span>
+          )}
           <textarea
             name="duties"
             placeholder="Duties Performed"

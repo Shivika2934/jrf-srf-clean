@@ -60,8 +60,10 @@ function ReviewApply({ formData, handleSubmit, prevStep }) {
       submissionData.append(`workExperienceDetails[${index}][post]`, experience.post);
       submissionData.append(`workExperienceDetails[${index}][company]`, experience.company);
       submissionData.append(`workExperienceDetails[${index}][location]`, experience.location);
-      submissionData.append(`workExperienceDetails[${index}][from]`, experience.from);
-      submissionData.append(`workExperienceDetails[${index}][to]`, experience.to);
+      submissionData.append(`workExperienceDetails[${index}][fromYear]`, experience.fromYear);
+      submissionData.append(`workExperienceDetails[${index}][toYear]`, experience.toYear);
+      submissionData.append(`workExperienceDetails[${index}][fromMonth]`, experience.fromMonth);
+      submissionData.append(`workExperienceDetails[${index}][toMonth]`, experience.toMonth);
       submissionData.append(`workExperienceDetails[${index}][duties]`, experience.duties);
     });
 
@@ -208,8 +210,10 @@ function ReviewApply({ formData, handleSubmit, prevStep }) {
           <p>Post: {experience.post}</p>
           <p>Company: {experience.company}</p>
           <p>Location: {experience.location}</p>
-          <p>From: {experience.from}</p>
-          <p>To: {experience.to}</p>
+          <p>From Year: {experience.fromYear}</p>
+          <p>From Month: {experience.fromMonth}</p>
+          <p>To Year: {experience.toYear}</p>
+          <p>To Month: {experience.toMonth}</p>
           <p>Duties: {experience.duties}</p>
         </div>
       ))}

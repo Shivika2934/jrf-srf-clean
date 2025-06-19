@@ -48,8 +48,11 @@ const formDataSchema = new mongoose.Schema({
       post: { type: String },
       company: { type: String },
       location: { type: String },
-      from: { type: String },
-      to: { type: String },
+      fromYear: { type: String },
+      toYear: { type: String },
+      fromMonth: { type: String },
+      toMonth: { type: String },
+      
       duties: { type: String },
     },
   ],

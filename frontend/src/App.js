@@ -28,7 +28,7 @@ function App() {
     totalWorkExperience: '',
     discipline: '',
     educationDetails: [{ degree: '', board: '', year: '', percentage: '', marksheet: null }],
-    workExperienceDetails: [{ post: '', company: '', location: '', from: '', to: '', duties: '' }],
+    workExperienceDetails: [{ post: '', company: '', location: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }],
     publications: [{ title: '', journal: '' }],
     registeredForPhD: '',
     phdDetails: '',
@@ -130,7 +130,7 @@ function App() {
   const addExperienceField = () => {
     setFormData({
       ...formData,
-      workExperienceDetails: [...formData.workExperienceDetails, { post: '', company: '', location: '', from: '', to: '', duties: '' }]
+      workExperienceDetails: [...formData.workExperienceDetails, { post: '', company: '', location: '', fromYear: '', toYear: '', fromMonth: '', toMonth: '', duties: '' }]
     });
   };
 
@@ -214,8 +214,10 @@ function App() {
         formDataToSubmit.append(`workExperienceDetails[${index}][post]`, experience.post);
         formDataToSubmit.append(`workExperienceDetails[${index}][company]`, experience.company);
         formDataToSubmit.append(`workExperienceDetails[${index}][location]`, experience.location);
-        formDataToSubmit.append(`workExperienceDetails[${index}][from]`, experience.from);
-        formDataToSubmit.append(`workExperienceDetails[${index}][to]`, experience.to);
+        formDataToSubmit.append(`workExperienceDetails[${index}][fromYear]`, experience.fromYear);
+        formDataToSubmit.append(`workExperienceDetails[${index}][toYear]`, experience.toYear);
+        formDataToSubmit.append(`workExperienceDetails[${index}][fromMonth]`, experience.fromMonth);
+        formDataToSubmit.append(`workExperienceDetails[${index}][toMonth]`, experience.toMonth);
         formDataToSubmit.append(`workExperienceDetails[${index}][duties]`, experience.duties);
       });
   
@@ -257,7 +259,7 @@ function App() {
         totalWorkExperience: '',
         discipline: '',
         educationDetails: [{ degree: '', board: '', year: '', percentage: '', marksheet: null }],
-        workExperienceDetails: [{ post: '', company: '', location: '', from: '', to: '', duties: '' }],
+        workExperienceDetails: [{ post: '', company: '', location: '', fromYear: '', fromMonth: '', toYear: '', toMonth: '', duties: '' }],
         publications: [{ title: '', journal: '' }],
         registeredForPhD: '',
         phdDetails: '',
@@ -302,7 +304,7 @@ function App() {
           yearOfQualifying &&
           totalWorkExperience &&
           educationDetails.every(edu => edu.degree && edu.board && edu.year && edu.percentage && edu.marksheet) &&
-          workExperienceDetails.every(exp => exp.post && exp.company && exp.location && exp.from && exp.to && exp.duties)
+          workExperienceDetails.every(exp => exp.post && exp.company && exp.location && exp.fromYear && exp.toYear && exp.fromMonth && exp.toMonth && exp.duties)
         );
       }
       case 3: {

@@ -132,8 +132,10 @@ const formValidationSchema = Joi.object({
             post: Joi.string().required(),
             company: Joi.string().required(),
             location: Joi.string().required(),
-            from: Joi.string().required(),
-            to: Joi.string().required(),
+            fromYear: Joi.string().required(),
+            toYear: Joi.string().required(),
+            fromMonth: Joi.string().required(),
+            toMonth: Joi.string().required(),
             duties: Joi.string().required(),
         })
     ).required(),
@@ -280,7 +282,7 @@ const flattenCandidateData = (candidate) => {
         if (Array.isArray(value)) {
             value.forEach((item, index) => {
                 Object.entries(item).forEach(([nestedKey, nestedValue]) => {
-                    if (nestedKey.toLowerCase().includes('date') || nestedKey === 'from' || nestedKey === 'to') {
+                    if (nestedKey.toLowerCase().includes('date') || nestedKey === 'fromYear' || nestedKey === 'toYear'|| nestedKey === 'fromMonth' || nestedKey === 'toMonth') {
                         flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
                             ? new Date(nestedValue).toISOString().split('T')[0]
                             : '';

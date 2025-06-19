@@ -36,7 +36,7 @@ function DocumentsUpload({
     if (!formData.registeredForPhD) {
       formValid = false;
       errors.registeredForPhD = "Please select if you have registered for PhD.";
-    } 
+    }
     else if (formData.registeredForPhD === 'Yes') {
       // Only validate PhD details if "Yes" is selected
       if (!formData.phdDetails) {
