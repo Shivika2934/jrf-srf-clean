@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-const MONGO_URI = 'mongodb://127.0.0.1:27017/your_database_name'; // Replace with your database name
+const MONGO_URI = 'mongodb://127.0.0.1:27017/jrf_form_db'; // Replace with your database name
 mongoose.connect(MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
