@@ -13,7 +13,7 @@ app.use(express.static('public')); // If you need to serve static files
 
 // MongoDB Connection
 const mongoURI = 'mongodb://127.0.0.1:27017/your_database_name'; // Replace with your MongoDB URI
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
@@ -156,6 +156,35 @@ app.post('/api/filterCandidates', async (req, res) => {
   } catch (err) {
     console.error('Error fetching filtered candidates:', err);
     res.status(500).json({ error: 'Failed to fetch filtered candidates' });
+  }
+});
+
+// Place DELETE routes BEFORE app.use(express.static(...)) and any catch-all routes
+
+// Delete all candidates
+app.delete('/api/deleteAllCandidates', async (req, res) => {
+  try {
+    await FormData.deleteMany({});
+    res.json({ message: 'All candidate data deleted successfully.' });
+  } catch (err) {
+    console.error('Error deleting all candidates:', err);
+    res.status(500).json({ error: 'Failed to delete all candidates' });
+  }
+});
+
+// Delete a single candidate by ID
+app.delete('/api/deleteCandidate/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await FormData.findByIdAndDelete(id);
+    if (result) {
+      res.json({ message: 'Candidate deleted successfully.' });
+    } else {
+      res.status(404).json({ error: 'Candidate not found.' });
+    }
+  } catch (err) {
+    console.error('Error deleting candidate:', err);
+    res.status(500).json({ error: 'Failed to delete candidate' });
   }
 });
 

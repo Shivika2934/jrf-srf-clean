@@ -60,7 +60,17 @@ const App = () => {
           setSubFields(['degree', 'board', 'year', 'percentage', 'marksheet']);
           break;
         case 'workExperienceDetails':
-          setSubFields(['post', 'company', 'location', 'domain','fromYear', 'fromMonth', 'toYear', 'toMonth', 'duties']);
+          setSubFields([
+            'post',
+            'company',
+            'location',
+            'domain',
+            'fromYear',
+            'fromMonth',
+            'toYear',
+            'toMonth',
+            'duties'
+          ]);
           break;
         case 'publications':
           setSubFields(['title', 'journal']);
@@ -213,6 +223,61 @@ const App = () => {
       .catch((err) => console.error('Error downloading Excel file:', err.message));
   };
 
+  // Add this helper to get the file download/view URL
+  const getFileUrl = (filePath) => {
+    if (!filePath) return '';
+    // Serve files from backend static 'uploads' folder
+    return `http://localhost:5000/${filePath.replace(/\\/g, '/').replace(/^.*uploads[\\/]/, 'uploads/')}`;
+  };
+
+  const formatWorkExperience = (item) => {
+    return (
+      <div style={{ marginBottom: '8px', borderBottom: '1px solid #eee' }}>
+        {item.post && <div><strong>Post:</strong> {item.post}</div>}
+        {item.company && <div><strong>Company:</strong> {item.company}</div>}
+        {item.location && <div><strong>Location:</strong> {item.location}</div>}
+        {item.domain && <div><strong>Domain:</strong> {item.domain}</div>}
+        {(item.fromMonth || item.fromYear) && (
+          <div>
+            <strong>From:</strong> {item.fromMonth ? item.fromMonth + ' ' : ''}{item.fromYear}
+          </div>
+        )}
+        {(item.toMonth || item.toYear) && (
+          <div>
+            <strong>To:</strong> {item.toMonth ? item.toMonth + ' ' : ''}{item.toYear}
+          </div>
+        )}
+        {item.duties && <div><strong>Duties:</strong> {item.duties}</div>}
+        {/* Show marksheet file if present */}
+        {item.marksheet && (
+          <div>
+            <strong>Marksheet:</strong>{' '}
+            <a href={getFileUrl(item.marksheet)} target="_blank" rel="noopener noreferrer">
+              View/Download
+            </a>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const handleDeleteCandidate = (id) => {
+    if (window.confirm('Are you sure you want to delete this candidate?')) {
+      fetch(`http://localhost:5001/api/deleteCandidate/${id}`, {
+        method: 'DELETE',
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          // Refresh candidate list after deletion
+          fetchCandidates();
+        })
+        .catch((err) => {
+          alert('Failed to delete candidate');
+          console.error('Error deleting candidate:', err);
+        });
+    }
+  };
+
   return (
     <div className="admin-page">
       <h1 className="welcome-header">Welcome, Admin! Ease the candidate shortlisting process</h1>
@@ -311,6 +376,7 @@ const App = () => {
               {entries.map((header, i) => (
                 <th key={i}>{formatColumnName(header)}</th>
               ))}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -318,33 +384,80 @@ const App = () => {
               <tr key={i}>
                 {entries.map((field, j) => (
                   <td key={j}>
-                    {Array.isArray(candidate[field])
+                    {field === 'workExperienceDetails' && Array.isArray(candidate[field])
+                      ? candidate[field].map((item, idx) => (
+                          <div key={idx}>{formatWorkExperience(item)}</div>
+                        ))
+                      : field === 'passportPhoto' && candidate[field]
+                      ? (
+                          <a
+                            href={getFileUrl(candidate[field])}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View/Download
+                          </a>
+                        )
+                      : field === 'phdDocuments' && candidate[field]
+                      ? (
+                          <a
+                            href={getFileUrl(candidate[field])}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View/Download
+                          </a>
+                        )
+                      : Array.isArray(candidate[field])
                       ? candidate[field].map((item, idx) => (
                           <div key={idx}>
                             {typeof item === 'object'
                               ? Object.entries(item)
-                                  .filter(([key]) => key !== 'id') // Exclude the 'id' field
-                                  .map(([key, value]) => (
-                                    <div key={key}>
-                                      <strong>{formatColumnName(key)}:</strong> {value}
-                                    </div>
-                                  ))
-                              : item}
+                                  .filter(([key]) => key !== 'id')
+                                  .map(([key, value]) =>
+                                    key === 'marksheet' && value ? (
+                                      <div key={key}>
+                                        <strong>{formatColumnName(key)}:</strong>{' '}
+                                        <a href={getFileUrl(value)} target="_blank" rel="noopener noreferrer">
+                                          View/Download
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <div key={key}>
+                                        <strong>{formatColumnName(key)}:</strong> {value}
+                                      </div>
+                                    )
+                                  )
+                            : item}
                           </div>
                         ))
                       : typeof candidate[field] === 'object'
                       ? Object.entries(candidate[field])
-                          .filter(([key]) => key !== 'id') // Exclude the 'id' field
-                          .map(([key, value]) => (
-                            <div key={key}>
-                              <strong>{formatColumnName(key)}:</strong> {value}
-                            </div>
-                          ))
+                          .filter(([key]) => key !== 'id')
+                          .map(([key, value]) =>
+                            key === 'marksheet' && value ? (
+                              <div key={key}>
+                                <strong>{formatColumnName(key)}:</strong>{' '}
+                                <a href={getFileUrl(value)} target="_blank" rel="noopener noreferrer">
+                                  View/Download
+                                </a>
+                              </div>
+                            ) : (
+                              <div key={key}>
+                                <strong>{formatColumnName(key)}:</strong> {value}
+                              </div>
+                            )
+                          )
                       : isValidDate(candidate[field])
                       ? new Date(candidate[field]).toLocaleDateString()
                       : candidate[field]}
                   </td>
                 ))}
+                {/* Photo column */}
+
+                <td>
+                  <button onClick={() => handleDeleteCandidate(candidate._id)}>Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
