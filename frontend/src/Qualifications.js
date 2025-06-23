@@ -5,8 +5,8 @@ const currentYear = new Date().getFullYear();
 const minYear = currentYear - 100;
 const maxYear = currentYear + 10;
 const validMonths = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 function Qualifications({
   formData,
@@ -133,7 +133,7 @@ function Qualifications({
         errors[`fromMonth_${index}`] = `From Month is required`;
       } else if (!validMonths.includes(experience.fromMonth)) {
         formValid = false;
-        errors[`fromMonth_${index}`] = `From Month must be between Jan and Dec`;
+        errors[`fromMonth_${index}`] = `From Month must be a full month name (e.g., January)`;
       }
 
       // Check To Month
@@ -142,7 +142,7 @@ function Qualifications({
         errors[`toMonth_${index}`] = `To Month is required`;
       } else if (!validMonths.includes(experience.toMonth)) {
         formValid = false;
-        errors[`toMonth_${index}`] = `To Month must be between Jan and Dec`;
+        errors[`toMonth_${index}`] = `To Month must be a full month name (e.g., December)`;
       }
       // Check To Year
       if (!experience.toYear) {

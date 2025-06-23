@@ -108,6 +108,7 @@ function App() {
 
   const handleExperienceChange = (index, e) => {
     const { name, value } = e.target;
+    // Accept any string for fromMonth and toMonth (full month names)
     const newWorkExperienceDetails = formData.workExperienceDetails.map((exp, expIndex) => {
       if (index === expIndex) {
         return { ...exp, [name]: value };
