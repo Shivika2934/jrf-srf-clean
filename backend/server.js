@@ -15,9 +15,10 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
-const MONGO_URI = 'mongodb://127.0.0.1:27017/jrf_form_db'; // Replace with your database name
+const MONGO_URI = 'mongodb://127.0.0.1:27017/your_database_name'; // Replace with your database name
 mongoose.connect(MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
@@ -53,8 +54,11 @@ const formSchema = new mongoose.Schema({
             post: String,
             company: String,
             location: String,
-            from: String,
-            to: String,
+            domain: String,
+            fromYear: String,
+            toYear: String,
+            fromMonth: String,
+            toMonth: String,
             duties: String,
         },
     ],
@@ -213,6 +217,9 @@ app.post('/api/submit', upload.any(), async (req, res) => {
                     fileData.educationDetails[index] = fileData.educationDetails[index] || {};
                     fileData.educationDetails[index].marksheet = file.path;
                 }
+            } else if (file.fieldname === 'photo' || file.fieldname === 'passportPhoto') {
+                // Accept both 'photo' and 'passportPhoto' for compatibility
+                fileData.passportPhoto = file.path;
             } else {
                 fileData[file.fieldname] = file.path;
             }
@@ -275,18 +282,24 @@ const flattenCandidateData = (candidate) => {
     const flatData = {};
 
     // Always include _id as the first column, fallback to empty string if not present
-    // Fix: Use candidate._id directly for the "_id" column, not "id"
     flatData['_id'] = candidate._id ? candidate._id.toString() : '';
 
     Object.entries(candidate).forEach(([key, value]) => {
-        if (key === '_id' || key === 'id' || key === '__v') return; // _id already handled, skip id/__v
+        if (key === '_id' || key === 'id' || key === '__v') return;
         if (Array.isArray(value)) {
             value.forEach((item, index) => {
                 Object.entries(item).forEach(([nestedKey, nestedValue]) => {
-                    if (nestedKey.toLowerCase().includes('date') || nestedKey === 'fromYear' || nestedKey === 'toYear'|| nestedKey === 'fromMonth' || nestedKey === 'toMonth') {
+                    // Show all work experience fields including domain, fromYear, toYear, fromMonth, toMonth
+                    if (
+                        nestedKey.toLowerCase().includes('date') ||
+                        nestedKey === 'fromYear' ||
+                        nestedKey === 'toYear' ||
+                        nestedKey === 'fromMonth' ||
+                        nestedKey === 'toMonth'
+                    ) {
                         flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue && !isNaN(new Date(nestedValue).getTime())
                             ? new Date(nestedValue).toISOString().split('T')[0]
-                            : '';
+                            : nestedValue || '';
                     } else {
                         flatData[`${key}[${index + 1}].${nestedKey}`] = nestedValue || '';
                     }
