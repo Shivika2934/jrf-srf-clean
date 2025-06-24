@@ -253,7 +253,7 @@ function PersonalInfo({ formData, handleChange, handlePhotoChange, nextStep }) {
         {errors.address && <span className="error">{errors.address}</span>}
       </div>
       <div>
-        <label>Contact Numbers:</label>
+        <label>Contact Number:</label>
         <input
           type="text"
           name="contactNumbers"
